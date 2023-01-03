@@ -1,0 +1,73 @@
+//Penyiram tanaman otomatis 
+ 
+#include <LiquidCrystal_I2C.h> 
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+ 
+const int pinDigital = A0; //inisialisasi pin sensor 
+const int relay = 6;       //inisialisasi pin relay 
+const int ledGreen = 7;    //inisialisasi pin led hijau 
+const int ledWhite = 8;   //inisialisasi pin led kuning 
+const int ledRed = 9;      //inisialisasi pin hijau 
+ 
+void setup() { 
+Serial.begin (9600);          //memanggil serial monitor lcd.init(); 
+lcd.backlight(); 
+lcd.clear(); 
+delay(1000); 
+lcd.setCursor(0, 0); 
+lcd.print("IRRIGATION"); 
+lcd.setCursor(0, 1); 
+lcd.print("SYSTEM IS ON "); 
+lcd.print(""); 
+delay(3000); 
+lcd.clear(); 
+pinMode(pinDigital, INPUT);   //menetapkan pin A0 sebagai input 
+pinMode(relay, OUTPUT);       //menetapkan pin 6 sebagai output 
+pinMode(ledGreen, OUTPUT);    //menetapkan pin 7 sebagai output 
+pinMode(ledWhite, OUTPUT);   //menetapkan pin 8 sebagai output 
+pinMode(ledRed, OUTPUT);      //menetapkan pin 9 sebagai output 
+} 
+ 
+void loop() { 
+int dataAnalog = analogRead (pinDigital);  //membaca nilai dari pin sensor 
+//print hasil ke serial monitor 
+Serial.print ("A0 : "); 
+Serial.print (dataAnalog); 
+ 
+//jika nilai A0 kurang dari 500, print kata serta nyalakan led hijau dan matikan led kuning, merah dan juga relay if (dataAnalog < 500) { 
+	 Serial.println(". Media Masih Basah");  
+	 digitalWrite (ledGreen, HIGH); 
+	 digitalWrite (ledWhite, LOW); 
+	 digitalWrite (ledRed, LOW); 
+	 digitalWrite (relay, LOW); 
+	 } 
+//tetapi, jika nilai A0 kurang dari 900, print kata serta nyalakan led kuning dan relay kemudian matikan led hijau dan juga merah 
+ else if (dataAnalog  < 800) { 
+	 Serial.println(". Kelembaban Tanah Masih Cukup");  	 digitalWrite (ledGreen, LOW); 
+	 digitalWrite (ledWhite, HIGH); 
+	 digitalWrite (ledRed, LOW); 
+	 digitalWrite (relay, HIGH); 
+	 lcd.setCursor(0, 0); 
+	 lcd.print("tanah masih lembab"); 
+	 } 
+//selain dari itu, hanya nyalakan led merah dan juga relay 
+ else { Serial.println (". Perlu Tambahan Air"); 	 digitalWrite (ledGreen, LOW); 
+	 digitalWrite (ledWhite, LOW); 
+	 digitalWrite (ledRed, HIGH); 
+	 digitalWrite (relay, HIGH); 
+	 lcd.setCursor(0, 0); 
+	 lcd.print("Water Pump is ON"); 
+	 } 
+	 if (dataAnalog < 300) { 
+		 lcd.setCursor(0, 1); 
+		 lcd.print("Moisture : Tinggi"); 
+< 950) { 
+	 } else if (dataAnalog > 300 && dataAnalog 		 lcd.setCursor(0, 1); 
+		 lcd.print("Moisture : lembab "); 
+	 } else if (dataAnalog > 950) { 
+		 lcd.setCursor(0, 1); 
+		 lcd.print("Moisture : kering "); 
+	 } 
+ 
+ delay (500); 
+} 
